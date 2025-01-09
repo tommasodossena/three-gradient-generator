@@ -54,7 +54,7 @@ debugObject.initial = {
 	},
 	noiseSettings: {
 		amount: 0.1,
-		speed: 0.02,
+		speed: 0.1,
 		frequency: { x: 3, y: 6 },
 	},
 };
