@@ -40,28 +40,53 @@ const textureLoader = new THREE.TextureLoader();
  * Materials
  */
 // Gradient material
-debugObject.wireframe = false;
-debugObject.color1 = "#8ecae6";
-debugObject.color2 = "#219ebc";
-debugObject.color3 = "#023047";
-debugObject.color4 = "#ffb703";
-debugObject.color5 = "#fb8500";
+debugObject.initial = {
+	wireframe: false,
+	color1: "#8ecae6",
+	color2: "#219ebc",
+	color3: "#023047",
+	color4: "#ffb703",
+	color5: "#fb8500",
+	cameraPosition: {
+		x: 0.075,
+		y: 0.175,
+		z: 0.075,
+	},
+	noiseSettings: {
+		amount: 0.1,
+		speed: 0.02,
+		frequency: { x: 3, y: 6 },
+	},
+};
+
+debugObject.wireframe = debugObject.initial.wireframe;
+debugObject.color1 = debugObject.initial.color1;
+debugObject.color2 = debugObject.initial.color2;
+debugObject.color3 = debugObject.initial.color3;
+debugObject.color4 = debugObject.initial.color4;
+debugObject.color5 = debugObject.initial.color5;
+debugObject.cameraPosition = { ...debugObject.initial.cameraPosition };
 
 const gradientMaterial = new THREE.ShaderMaterial({
 	uniforms: {
 		uColor: {
 			value: [
-				new THREE.Color(debugObject.color1),
-				new THREE.Color(debugObject.color2),
-				new THREE.Color(debugObject.color3),
-				new THREE.Color(debugObject.color4),
-				new THREE.Color(debugObject.color5),
+				new THREE.Color(debugObject.initial.color1),
+				new THREE.Color(debugObject.initial.color2),
+				new THREE.Color(debugObject.initial.color3),
+				new THREE.Color(debugObject.initial.color4),
+				new THREE.Color(debugObject.initial.color5),
 			],
 		},
 		uTime: { value: 0 },
-		uAmount: { value: 0.1 },
-		uSpeed: { value: 0.02 },
-		uFrequency: { value: new THREE.Vector2(3, 6) },
+		uAmount: { value: debugObject.initial.noiseSettings.amount },
+		uSpeed: { value: debugObject.initial.noiseSettings.speed },
+		uFrequency: {
+			value: new THREE.Vector2(
+				debugObject.initial.noiseSettings.frequency.x,
+				debugObject.initial.noiseSettings.frequency.y,
+			),
+		},
 	},
 	vertexShader: vertexShader,
 	fragmentShader: fragmentShader,
@@ -227,7 +252,7 @@ const resetCamera = () => {
 };
 
 const cameraEditButton = pane.addButton({
-	title: "Edit Camera",
+	title: "🎥 Edit Camera",
 });
 cameraEditButton.on("click", () => {
 	debugObject.editCamera = !debugObject.editCamera;
@@ -243,20 +268,63 @@ cameraEditButton.on("click", () => {
 });
 
 const randomizeColorsButton = pane.addButton({
-	title: "Randomize Colors",
-	disabled: true,
+	title: "🎨 Randomize Colors",
+	disabled: false,
 });
 
 randomizeColorsButton.on("click", () => {
-	console.log("randomize");
+	// Generate random colors
+	const randomColor = () => {
+		const hue = Math.random();
+		const saturation = 0.5 + Math.random() * 0.5; // 0.5 to 1.0
+		const lightness = 0.4 + Math.random() * 0.4; // 0.4 to 0.8
+		return `hsl(${hue * 360}, ${saturation * 100}%, ${lightness * 100}%)`;
+	};
+
+	// Update debug object colors
+	debugObject.color1 = randomColor();
+	debugObject.color2 = randomColor();
+	debugObject.color3 = randomColor();
+	debugObject.color4 = randomColor();
+	debugObject.color5 = randomColor();
+
+	// Update material uniforms
+	gradientMaterial.uniforms.uColor.value[0].set(debugObject.color1);
+	gradientMaterial.uniforms.uColor.value[1].set(debugObject.color2);
+	gradientMaterial.uniforms.uColor.value[2].set(debugObject.color3);
+	gradientMaterial.uniforms.uColor.value[3].set(debugObject.color4);
+	gradientMaterial.uniforms.uColor.value[4].set(debugObject.color5);
+
+	// Update the color pickers in the UI
+	colorFolder.refresh();
 });
 
 const exportImageButton = pane.addButton({
-	title: "Export Image",
-	disabled: true,
+	title: "🖼️ Export Image",
+	disabled: false,
 });
+
 exportImageButton.on("click", () => {
-	console.log("export");
+	// Render the scene
+	renderer.render(scene, camera);
+
+	try {
+		// Get the canvas data as a data URL
+		const dataURL = renderer.domElement.toDataURL("image/png");
+
+		// Create a temporary link element
+		const link = document.createElement("a");
+		link.href = dataURL;
+		link.download = `gradient-${Date.now()}.png`;
+
+		// Programmatically click the link to trigger the download
+		document.body.appendChild(link);
+		link.click();
+		document.body.removeChild(link);
+	} catch (error) {
+		console.error("Error exporting image:", error);
+		alert("Failed to export image. Please try again.");
+	}
 });
 
 pane.addBlade({
@@ -264,11 +332,55 @@ pane.addBlade({
 });
 
 const resetButton = pane.addButton({
-	title: "Reset",
-	disabled: true,
+	title: "🔄 Reset",
+	disabled: false,
 });
+
 resetButton.on("click", () => {
-	console.log("reset");
+	// Reset colors
+	debugObject.color1 = debugObject.initial.color1;
+	debugObject.color2 = debugObject.initial.color2;
+	debugObject.color3 = debugObject.initial.color3;
+	debugObject.color4 = debugObject.initial.color4;
+	debugObject.color5 = debugObject.initial.color5;
+
+	// Update material uniforms
+	gradientMaterial.uniforms.uColor.value[0].set(debugObject.initial.color1);
+	gradientMaterial.uniforms.uColor.value[1].set(debugObject.initial.color2);
+	gradientMaterial.uniforms.uColor.value[2].set(debugObject.initial.color3);
+	gradientMaterial.uniforms.uColor.value[3].set(debugObject.initial.color4);
+	gradientMaterial.uniforms.uColor.value[4].set(debugObject.initial.color5);
+
+	// Reset noise settings
+	gradientMaterial.uniforms.uAmount.value =
+		debugObject.initial.noiseSettings.amount;
+	gradientMaterial.uniforms.uSpeed.value =
+		debugObject.initial.noiseSettings.speed;
+	gradientMaterial.uniforms.uFrequency.value.set(
+		debugObject.initial.noiseSettings.frequency.x,
+		debugObject.initial.noiseSettings.frequency.y,
+	);
+
+	// Reset wireframe
+	debugObject.wireframe = debugObject.initial.wireframe;
+	gradientMaterial.wireframe = debugObject.initial.wireframe;
+
+	// Reset camera
+	debugObject.editCamera = false;
+	controls.enabled = false;
+	camera.position.set(
+		debugObject.initial.cameraPosition.x,
+		debugObject.initial.cameraPosition.y,
+		debugObject.initial.cameraPosition.z,
+	);
+	controls.target.set(0, 0, 0);
+	controls.update();
+
+	// Update UI
+	colorFolder.refresh();
+	noiseFolder.refresh();
+	meshFolder.refresh();
+	cameraEditButton.title = "Edit Camera";
 });
 
 /**
