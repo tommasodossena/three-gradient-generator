@@ -87,6 +87,7 @@ const gradientMaterial = new THREE.ShaderMaterial({
 				debugObject.initial.noiseSettings.frequency.y,
 			),
 		},
+		uEnableGrain: { value: false },
 	},
 	vertexShader: vertexShader,
 	fragmentShader: fragmentShader,
@@ -181,6 +182,10 @@ noiseFolder.addBinding(gradientMaterial.uniforms.uFrequency, "value", {
 	picker: "inline",
 });
 
+meshFolder.addBinding(gradientMaterial.uniforms.uEnableGrain, "value", {
+	label: "grain",
+});
+
 scene.add(plane);
 
 /**
@@ -212,7 +217,7 @@ window.addEventListener("resize", () => {
 debugObject.editCamera = false;
 debugObject.cameraPosition = {
 	x: 0.075,
-	y: 0.175,
+	y: 0.2,
 	z: 0.075,
 };
 
@@ -263,8 +268,8 @@ cameraEditButton.on("click", () => {
 	}
 
 	cameraEditButton.title = debugObject.editCamera
-		? "Reset Camera"
-		: "Edit Camera";
+		? "🎥 Reset Camera"
+		: "🎥 Edit Camera";
 });
 
 const randomizeColorsButton = pane.addButton({
@@ -380,7 +385,7 @@ resetButton.on("click", () => {
 	colorFolder.refresh();
 	noiseFolder.refresh();
 	meshFolder.refresh();
-	cameraEditButton.title = "Edit Camera";
+	cameraEditButton.title = "🎥 Edit Camera";
 });
 
 /**
