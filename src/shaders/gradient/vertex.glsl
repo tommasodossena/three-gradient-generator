@@ -2,7 +2,7 @@ uniform vec2 uFrequency;
 uniform float uTime;
 uniform float uAmount;
 uniform float uSpeed;
-uniform vec3 uColor[5];
+uniform vec3 uColor[3];
 
 varying vec2 vUv;
 varying vec3 vColor;
@@ -70,15 +70,15 @@ void main() {
     float noise = snoise(vec3(noiseCoord.x + uTime*0.02, noiseCoord.y, uTime * uSpeed));
     modelPosition.y += noise * uAmount;
 
-    // Color mixing logic
-    vColor = uColor[4];
-    for(int i = 0; i < 4; i++) {
-        float noiseFlow = 0.0002 + float(i)*0.05;
-        float noiseSpeed = 0.0001 + float(i)*0.03;
-        float noiseSeed = 1.0 + float(i)*10.0;
+    // Updated color mixing logic for 3 colors
+    vColor = uColor[2]; // Start with the last color
+    for(int i = 0; i < 2; i++) {
+        float noiseFlow = 0.0002 + float(i)*0.07; // Adjusted flow for better distribution
+        float noiseSpeed = 0.0001 + float(i)*0.04; // Adjusted speed
+        float noiseSeed = 1.0 + float(i)*15.0; // Increased seed difference
         vec2 noiseFreq = vec2(0.3, 0.6);
         float noiseFloor = 0.1;
-        float noiseCeiling = 0.6 + float(i)*0.08;
+        float noiseCeiling = 0.6 + float(i)*0.12; // Adjusted ceiling for better color separation
 
         float noise = smoothstep(
             noiseFloor,

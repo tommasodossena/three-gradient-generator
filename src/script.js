@@ -74,8 +74,6 @@ const gradientMaterial = new THREE.ShaderMaterial({
 				new THREE.Color(debugObject.initial.color1),
 				new THREE.Color(debugObject.initial.color2),
 				new THREE.Color(debugObject.initial.color3),
-				new THREE.Color(debugObject.initial.color4),
-				new THREE.Color(debugObject.initial.color5),
 			],
 		},
 		uTime: { value: 0 },
@@ -120,24 +118,6 @@ colorFolder
 	})
 	.on("change", ({ value }) => {
 		gradientMaterial.uniforms.uColor.value[2] = new THREE.Color(value);
-	});
-
-colorFolder
-	.addBinding(debugObject, "color4", {
-		label: "color 4",
-		view: "color",
-	})
-	.on("change", ({ value }) => {
-		gradientMaterial.uniforms.uColor.value[3] = new THREE.Color(value);
-	});
-
-colorFolder
-	.addBinding(debugObject, "color5", {
-		label: "color 5",
-		view: "color",
-	})
-	.on("change", ({ value }) => {
-		gradientMaterial.uniforms.uColor.value[4] = new THREE.Color(value);
 	});
 
 /**
