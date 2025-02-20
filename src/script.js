@@ -277,8 +277,6 @@ randomizeColorsButton.on("click", () => {
 	gradientMaterial.uniforms.uColor.value[0].set(debugObject.color1);
 	gradientMaterial.uniforms.uColor.value[1].set(debugObject.color2);
 	gradientMaterial.uniforms.uColor.value[2].set(debugObject.color3);
-	gradientMaterial.uniforms.uColor.value[3].set(debugObject.color4);
-	gradientMaterial.uniforms.uColor.value[4].set(debugObject.color5);
 
 	// Update the color pickers in the UI
 	colorFolder.refresh();
@@ -333,8 +331,6 @@ resetButton.on("click", () => {
 	gradientMaterial.uniforms.uColor.value[0].set(debugObject.initial.color1);
 	gradientMaterial.uniforms.uColor.value[1].set(debugObject.initial.color2);
 	gradientMaterial.uniforms.uColor.value[2].set(debugObject.initial.color3);
-	gradientMaterial.uniforms.uColor.value[3].set(debugObject.initial.color4);
-	gradientMaterial.uniforms.uColor.value[4].set(debugObject.initial.color5);
 
 	// Reset noise settings
 	gradientMaterial.uniforms.uAmount.value =
