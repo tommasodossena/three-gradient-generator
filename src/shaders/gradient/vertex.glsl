@@ -67,8 +67,21 @@ void main() {
     vec4 modelPosition = modelMatrix * vec4(position, 1.0);
     vec2 noiseCoord = uv * vec2(uFrequency.x, uFrequency.y);
 
+    // Get the noise value
     float noise = snoise(vec3(noiseCoord.x + uTime*0.02, noiseCoord.y, uTime * uSpeed));
-    modelPosition.y += noise * uAmount;
+
+    // Clamp the noise value to prevent extreme displacements
+    // This limits the range to [-0.8, 0.8] instead of [-1, 1]
+    noise = clamp(noise, -0.8, 0.8);
+
+    // Apply the displacement with a maximum limit
+    float maxDisplacement = 0.15; // Maximum displacement allowed
+    float displacement = noise * uAmount;
+
+    // Ensure the displacement doesn't exceed the maximum
+    displacement = clamp(displacement, -maxDisplacement, maxDisplacement);
+
+    modelPosition.y += displacement;
 
     // Updated color mixing logic for 3 colors
     vColor = uColor[2]; // Start with the last color

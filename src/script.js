@@ -42,14 +42,12 @@ const textureLoader = new THREE.TextureLoader();
 // Gradient material
 debugObject.initial = {
 	wireframe: false,
-	color1: "#8ecae6",
-	color2: "#219ebc",
-	color3: "#023047",
-	color4: "#ffb703",
-	color5: "#fb8500",
+	color1: "#fbb458",
+	color2: "#8ec119",
+	color3: "#4566fe",
 	cameraPosition: {
 		x: 0.075,
-		y: 0.175,
+		y: 0.25,
 		z: 0.075,
 	},
 	noiseSettings: {
@@ -57,14 +55,13 @@ debugObject.initial = {
 		speed: 0.1,
 		frequency: { x: 3, y: 6 },
 	},
+	grainAmount: 0.08,
 };
 
 debugObject.wireframe = debugObject.initial.wireframe;
 debugObject.color1 = debugObject.initial.color1;
 debugObject.color2 = debugObject.initial.color2;
 debugObject.color3 = debugObject.initial.color3;
-debugObject.color4 = debugObject.initial.color4;
-debugObject.color5 = debugObject.initial.color5;
 debugObject.cameraPosition = { ...debugObject.initial.cameraPosition };
 
 const gradientMaterial = new THREE.ShaderMaterial({
@@ -86,6 +83,7 @@ const gradientMaterial = new THREE.ShaderMaterial({
 			),
 		},
 		uEnableGrain: { value: false },
+		uGrainAmount: { value: 0.08 },
 	},
 	vertexShader: vertexShader,
 	fragmentShader: fragmentShader,
@@ -166,6 +164,14 @@ meshFolder.addBinding(gradientMaterial.uniforms.uEnableGrain, "value", {
 	label: "grain",
 });
 
+meshFolder.addBinding(gradientMaterial.uniforms.uGrainAmount, "value", {
+	label: "grain amount",
+	min: 0.0,
+	max: 0.2,
+	step: 0.01,
+	hidden: () => !gradientMaterial.uniforms.uEnableGrain.value,
+});
+
 scene.add(plane);
 
 /**
@@ -197,7 +203,7 @@ window.addEventListener("resize", () => {
 debugObject.editCamera = false;
 debugObject.cameraPosition = {
 	x: 0.075,
-	y: 0.2,
+	y: 0.25,
 	z: 0.075,
 };
 
@@ -220,7 +226,7 @@ scene.add(camera);
 const controls = new OrbitControls(camera, canvas);
 controls.enabled = false;
 controls.enableDamping = true;
-controls.minDistance = 0.175;
+controls.minDistance = 0.25;
 controls.maxDistance = 3;
 
 const resetCamera = () => {
@@ -270,8 +276,6 @@ randomizeColorsButton.on("click", () => {
 	debugObject.color1 = randomColor();
 	debugObject.color2 = randomColor();
 	debugObject.color3 = randomColor();
-	debugObject.color4 = randomColor();
-	debugObject.color5 = randomColor();
 
 	// Update material uniforms
 	gradientMaterial.uniforms.uColor.value[0].set(debugObject.color1);
@@ -324,8 +328,6 @@ resetButton.on("click", () => {
 	debugObject.color1 = debugObject.initial.color1;
 	debugObject.color2 = debugObject.initial.color2;
 	debugObject.color3 = debugObject.initial.color3;
-	debugObject.color4 = debugObject.initial.color4;
-	debugObject.color5 = debugObject.initial.color5;
 
 	// Update material uniforms
 	gradientMaterial.uniforms.uColor.value[0].set(debugObject.initial.color1);
@@ -341,6 +343,10 @@ resetButton.on("click", () => {
 		debugObject.initial.noiseSettings.frequency.x,
 		debugObject.initial.noiseSettings.frequency.y,
 	);
+
+	// Reset grain amount
+	gradientMaterial.uniforms.uGrainAmount.value =
+		debugObject.initial.grainAmount;
 
 	// Reset wireframe
 	debugObject.wireframe = debugObject.initial.wireframe;
